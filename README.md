@@ -1,7 +1,5 @@
-# 📚 StudySpot — Сервис поиска мероприятий для студентов
-
 <div align="center">
-  <h1>StudySpot</h1>
+  <h1>📚 StudySpot</h1>
   <p><strong>Сервис поиска мероприятий для студентов на Go с современным веб-интерфейсом</strong></p>
   <p>
     <img src="https://img.shields.io/badge/Go-1.22-00ADD8?style=flat-square&logo=go" alt="Go 1.22">
