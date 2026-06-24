@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>StudySpot — Поиск мероприятий</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #0b0e14;
+            color: #e8edf5;
+            min-height: 100vh;
+            padding: 24px;
+        }
+        button {
+            cursor: pointer;
+            font-family: inherit;
+        }
+        input, select, textarea {
+            font-family: inherit;
+            background: #1a1f2b;
+            border: 1px solid #2a3140;
+            color: #e8edf5;
+            padding: 10px 14px;
+            border-radius: 10px;
+            font-size: 14px;
+            width: 100%;
+        }
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #6c8cff;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+            padding: 16px 0 24px;
+            border-bottom: 1px solid #1a1f2b;
+            margin-bottom: 32px;
+        }
+        .logo {
+            font-size: 28px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #6c8cff, #a78bfa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .logo span {
+            font-weight: 300;
+            -webkit-text-fill-color: #6b7a99;
+        }
+        .header-actions {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .user-badge {
+            background: #1a1f2b;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 13px;
+            color: #9aa8c7;
+        }
+        .user-badge strong {
+            color: #e8edf5;
+        }
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+        .btn-primary {
+            background: #6c8cff;
+            color: #fff;
+        }
+        .btn-primary:hover {
+            background: #5a7ae8;
+        }
+        .btn-secondary {
+            background: #1a1f2b;
+            color: #e8edf5;
+            border: 1px solid #2a3140;
+        }
+        .btn-secondary:hover {
+            background: #2a3140;
+        }
+        .btn-danger {
+            background: #ff6b6b;
+            color: #fff;
+        }
+        .btn-danger:hover {
+            background: #e55a5a;
+        }
+        .btn-success {
+            background: #51cf66;
+            color: #fff;
+        }
+        .btn-success:hover {
+            background: #40c057;
+        }
+        .btn-sm {
+            padding: 6px 14px;
+            font-size: 12px;
+        }
+        .filters {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 24px;
+            align-items: center;
+        }
+        .filters input, .filters select {
+            flex: 1 1 200px;
+            min-width: 140px;
+        }
+        .events-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+            margin-top: 16px;
+        }
+        .event-card {
+            background: #12171f;
+            border: 1px solid #1a1f2b;
+            border-radius: 16px;
+            padding: 20px;
+            transition: all 0.25s;
+        }
+        .event-card:hover {
+            border-color: #2a3140;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.4);
+        }
+        .event-card .category {
+            display: inline-block;
+            background: #1a1f2b;
+            color: #6c8cff;
+            font-size: 11px;
+            font-weight: 600;
+            padding: 4px 12px;
+            border-radius: 20px;
+            text-transform: uppercase;
+        }
+        .event-card h3 {
+            margin: 12px 0 8px;
+            font-size: 18px;
+        }
+        .event-card p {
+            color: #9aa8c7;
+            font-size: 14px;
+            line-height: 1.5;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        .event-card .meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 14px;
+            font-size: 13px;
+            color: #6b7a99;
+        }
+        .event-card .admin-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 14px;
+            padding-top: 14px;
+            border-top: 1px solid #1a1f2b;
+        }
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            backdrop-filter: blur(6px);
+            z-index: 999;
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-overlay.active {
+            display: flex;
+        }
+        .modal {
+            background: #12171f;
+            border: 1px solid #2a3140;
+            border-radius: 20px;
+            padding: 32px;
+            max-width: 500px;
+            width: 92%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        .modal h2 {
+            margin-bottom: 20px;
+        }
+        .modal .form-group {
+            margin-bottom: 16px;
+        }
+        .modal .form-group label {
+            display: block;
+            font-size: 13px;
+            font-weight: 500;
+            color: #9aa8c7;
+            margin-bottom: 4px;
+        }
+        .modal .form-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 20px;
+            justify-content: flex-end;
+        }
+        .auth-form {
+            max-width: 380px;
+            margin: 40px auto;
+            background: #12171f;
+            border: 1px solid #1a1f2b;
+            border-radius: 20px;
+            padding: 32px;
+        }
+        .auth-form h2 {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+        .auth-form .btn {
+            width: 100%;
+            margin-top: 8px;
+        }
+        .auth-form .switch {
+            text-align: center;
+            margin-top: 16px;
+            font-size: 14px;
+            color: #6b7a99;
+        }
+        .auth-form .switch a {
+            color: #6c8cff;
+            cursor: pointer;
+        }
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #6b7a99;
+        }
+        .empty-state .icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+        }
+        .empty-state h3 {
+            color: #e8edf5;
+            margin-bottom: 8px;
+        }
+        .loader {
+            text-align: center;
+            padding: 40px;
+            color: #6b7a99;
+        }
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            padding: 14px 24px;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 500;
+            z-index: 9999;
+            max-width: 400px;
+        }
+        .toast-success { background: #2b8a3e; color: #fff; }
+        .toast-error { background: #c92a2a; color: #fff; }
+        .toast-info { background: #1864ab; color: #fff; }
+        @media (max-width: 640px) {
+            .header { flex-direction: column; align-items: stretch; text-align: center; }
+            .filters { flex-direction: column; }
+            .filters input, .filters select { flex: 1 1 auto; width: 100%; }
+            .events-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <div class="logo">Study<span>Spot</span></div>
+            <div class="header-actions" id="headerActions"></div>
+        </header>
+
+        <div class="filters">
+            <input type="text" id="searchInput" placeholder="🔍 Поиск..." />
+            <select id="categoryFilter"><option value="">Все категории</option></select>
+            <button class="btn btn-primary" id="searchBtn">Поиск</button>
+            <button class="btn btn-secondary" id="clearFiltersBtn">Сбросить</button>
+            <button class="btn btn-success" id="createEventBtn" style="display:none;">+ Создать</button>
+        </div>
+
+        <div id="eventsContainer"><div class="loader">Загрузка...</div></div>
+    </div>
+
+    <!-- Модалка события -->
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal">
+            <h2 id="modalTitle">Новое мероприятие</h2>
+            <form id="eventForm">
+                <input type="hidden" id="eventId" />
+                <div class="form-group"><label>Название</label><input type="text" id="formTitle" required /></div>
+                <div class="form-group"><label>Описание</label><textarea id="formDescription"></textarea></div>
+                <div class="form-group"><label>Категория</label><select id="formCategory"></select></div>
+                <div class="form-group"><label>Дата</label><input type="datetime-local" id="formDate" required /></div>
+                <div class="form-group"><label>Место</label><input type="text" id="formLocation" /></div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" id="modalCancel">Отмена</button>
+                    <button type="submit" class="btn btn-primary">Сохранить</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Модалка авторизации -->
+    <div class="modal-overlay" id="authModalOverlay">
+        <div class="modal auth-form">
+            <h2 id="authTitle">Вход</h2>
+            <form id="authForm">
+                <div class="form-group"><label>Email</label><input type="email" id="authEmail" required /></div>
+                <div class="form-group"><label>Пароль</label><input type="password" id="authPassword" required /></div>
+                <button type="submit" class="btn btn-primary" id="authSubmit">Войти</button>
+                <div class="switch">
+                    <span id="authSwitchText">Нет аккаунта?</span>
+                    <a id="authSwitchLink">Зарегистрироваться</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+<script>
+// ========== КОНФИГ ==========
+const API = '/api';
+
+// ========== СОСТОЯНИЕ ==========
+let token = localStorage.getItem('token') || null;
+let user = null;
+let isAdmin = false;
+
+try {
+    const saved = localStorage.getItem('user');
+    if (saved && saved !== 'undefined') {
+        user = JSON.parse(saved);
+        isAdmin = user?.role === 'admin';
+    }
+} catch(e) {
+    console.warn('Ошибка восстановления user:', e);
+    localStorage.removeItem('user');
+}
+
+// ========== DOM ==========
+const $ = id => document.getElementById(id);
+const headerActions = $('headerActions');
+const eventsContainer = $('eventsContainer');
+const searchInput = $('searchInput');
+const categoryFilter = $('categoryFilter');
+
+// ========== HELPERS ==========
+function toast(msg, type = 'info') {
+    const old = document.querySelector('.toast');
+    if (old) old.remove();
+    const el = document.createElement('div');
+    el.className = `toast toast-${type}`;
+    el.textContent = msg;
+    document.body.appendChild(el);
+    setTimeout(() => el.remove(), 3500);
+}
+
+function formatDate(d) {
+    try {
+        return new Date(d).toLocaleString('ru-RU', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+    } catch(e) {
+        return 'Дата не указана';
+    }
+}
+
+function getHeaders() {
+    const headers = { 'Content-Type': 'application/json' };
+    if (token) headers['Authorization'] = `Bearer ${token}`;
+    return headers;
+}
+
+async function api(method, path, body) {
+    try {
+        const res = await fetch(API + path, {
+            method,
+            headers: getHeaders(),
+            body: body ? JSON.stringify(body) : undefined
+        });
+        const data = await res.json();
+        return { ok: res.ok, status: res.status, data };
+    } catch(e) {
+        console.error('API Error:', e);
+        return { ok: false, status: 0, data: { error: 'Ошибка соединения' } };
+    }
+}
+
+// ========== АВТОРИЗАЦИЯ ==========
+function showAuth(login = true) {
+    const isLogin = login;
+    $('authTitle').textContent = isLogin ? 'Вход' : 'Регистрация';
+    $('authSubmit').textContent = isLogin ? 'Войти' : 'Зарегистрироваться';
+    $('authSwitchText').textContent = isLogin ? 'Нет аккаунта?' : 'Уже есть аккаунт?';
+    $('authSwitchLink').textContent = isLogin ? 'Зарегистрироваться' : 'Войти';
+    $('authModalOverlay').classList.add('active');
+}
+
+function closeAuth() {
+    $('authModalOverlay').classList.remove('active');
+}
+
+$('authSwitchLink').addEventListener('click', () => {
+    const isLogin = $('authTitle').textContent === 'Вход';
+    showAuth(!isLogin);
+});
+
+$('authForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const email = $('authEmail').value.trim();
+    const password = $('authPassword').value.trim();
+    if (!email || !password) { toast('Заполните все поля', 'error'); return; }
+
+    const isLogin = $('authTitle').textContent === 'Вход';
+    const path = isLogin ? '/auth/login' : '/auth/register';
+    const res = await api('POST', path, { email, password });
+
+    if (res.ok) {
+        if (isLogin) {
+            token = res.data.data?.token || res.data.token;
+            user = res.data.data?.user || res.data.user;
+            isAdmin = user?.role === 'admin';
+            localStorage.setItem('token', token);
+            localStorage.setItem('user', JSON.stringify(user));
+            toast(`Добро пожаловать, ${user.email}!`, 'success');
+            closeAuth();
+            render();
+        } else {
+            toast('Регистрация успешна! Теперь войдите.', 'success');
+            showAuth(true);
+            $('authEmail').value = email;
+        }
+    } else {
+        toast(res.data.error || 'Ошибка, проверьте данные', 'error');
+    }
+});
+
+function logout() {
+    token = null;
+    user = null;
+    isAdmin = false;
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    toast('Вы вышли', 'info');
+    render();
+}
+
+// ========== ЗАГРУЗКА ДАННЫХ ==========
+async function loadCategories() {
+    const res = await api('GET', '/categories');
+    if (res.ok) {
+        let cats = res.data.data || res.data || [];
+        if (!Array.isArray(cats)) cats = [];
+        
+        categoryFilter.innerHTML = '<option value="">Все категории</option>' +
+            cats.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+        $('formCategory').innerHTML = '<option value="">Без категории</option>' +
+            cats.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+        return cats;
+    }
+    return [];
+}
+
+async function loadEvents(search = '', category = '') {
+    let url = '/events';
+    const params = new URLSearchParams();
+    if (search) params.set('q', search);
+    if (category) params.set('category', category);
+    if (params.toString()) url = '/events/search?' + params.toString();
+
+    const res = await api('GET', url);
+    if (res.ok) {
+        let data = res.data.data || res.data || {};
+        let events = data.events || data || [];
+        if (!Array.isArray(events)) events = [];
+        return events;
+    }
+    return [];
+}
+
+// ========== ОТРИСОВКА ==========
+function renderEvents(events) {
+    if (!events || !Array.isArray(events) || events.length === 0) {
+        eventsContainer.innerHTML = `
+            <div class="empty-state">
+                <div class="icon">📭</div>
+                <h3>Мероприятий пока нет</h3>
+                <p>${isAdmin ? 'Нажмите "Создать", чтобы добавить первое!' : 'Загляните позже'}</p>
+            </div>
+        `;
+        return;
+    }
+
+    eventsContainer.innerHTML = `
+        <div class="events-grid">
+            ${events.map(e => `
+                <div class="event-card">
+                    <span class="category">${e.category_name || 'Без категории'}</span>
+                    <h3>${e.title}</h3>
+                    <p>${e.description || 'Без описания'}</p>
+                    <div class="meta">
+                        <span>📅 ${formatDate(e.date)}</span>
+                        <span>📍 ${e.location || 'Не указано'}</span>
+                    </div>
+                    ${isAdmin ? `
+                        <div class="admin-actions">
+                            <button class="btn btn-primary btn-sm" onclick="editEvent('${e.id}')">✏️</button>
+                            <button class="btn btn-danger btn-sm" onclick="deleteEvent('${e.id}')">🗑️</button>
+                        </div>
+                    ` : ''}
+                </div>
+            `).join('')}
+        </div>
+    `;
+}
+
+function renderHeader() {
+    if (user && token) {
+        headerActions.innerHTML = `
+            <span class="user-badge">👤 <strong>${user.email}</strong> ${isAdmin ? '👑' : ''}</span>
+            ${isAdmin ? '<button class="btn btn-primary btn-sm" onclick="openModal()">+ Создать</button>' : ''}
+            <button class="btn btn-secondary btn-sm" onclick="logout()">Выйти</button>
+        `;
+        $('createEventBtn').style.display = isAdmin ? 'inline-block' : 'none';
+    } else {
+        headerActions.innerHTML = `
+            <button class="btn btn-primary btn-sm" onclick="showAuth(true)">Войти</button>
+        `;
+        $('createEventBtn').style.display = 'none';
+    }
+}
+
+async function doSearch() {
+    const q = searchInput.value.trim();
+    const cat = categoryFilter.value;
+    eventsContainer.innerHTML = '<div class="loader">Загрузка...</div>';
+    const events = await loadEvents(q, cat);
+    renderEvents(events);
+}
+
+// ========== МОДАЛКА СОБЫТИЯ ==========
+function openModal(eventData = null) {
+    $('modalTitle').textContent = eventData ? 'Редактировать' : 'Новое мероприятие';
+    $('eventId').value = eventData?.id || '';
+    $('formTitle').value = eventData?.title || '';
+    $('formDescription').value = eventData?.description || '';
+    $('formCategory').value = eventData?.category_id || '';
+    $('formDate').value = eventData?.date ? new Date(eventData.date).toISOString().slice(0, 16) : '';
+    $('formLocation').value = eventData?.location || '';
+    $('modalOverlay').classList.add('active');
+}
+
+function closeModal() {
+    $('modalOverlay').classList.remove('active');
+    $('eventForm').reset();
+    $('eventId').value = '';
+}
+
+$('modalCancel').addEventListener('click', closeModal);
+$('modalOverlay').addEventListener('click', (e) => {
+    if (e.target === $('modalOverlay')) closeModal();
+});
+$('createEventBtn').addEventListener('click', () => openModal());
+
+$('eventForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const data = {
+        title: $('formTitle').value.trim(),
+        description: $('formDescription').value.trim(),
+        category_id: $('formCategory').value || null,
+        date: new Date($('formDate').value).toISOString(),
+        location: $('formLocation').value.trim(),
+    };
+    const id = $('eventId').value;
+    const method = id ? 'PUT' : 'POST';
+    const path = id ? `/events/${id}` : '/events';
+    const res = await api(method, path, data);
+    if (res.ok) {
+        toast(id ? 'Обновлено!' : 'Создано!', 'success');
+        closeModal();
+        doSearch();
+    } else {
+        toast(res.data.error || 'Ошибка', 'error');
+    }
+});
+
+// Глобальные функции для кнопок
+window.editEvent = async (id) => {
+    const res = await api('GET', `/events/${id}`);
+    if (res.ok) {
+        openModal(res.data.data || res.data);
+    } else {
+        toast('Не удалось загрузить', 'error');
+    }
+};
+
+window.deleteEvent = async (id) => {
+    if (!confirm('Удалить мероприятие?')) return;
+    const res = await api('DELETE', `/events/${id}`);
+    if (res.ok) {
+        toast('Удалено!', 'success');
+        doSearch();
+    } else {
+        toast(res.data.error || 'Ошибка', 'error');
+    }
+};
+
+// ========== ПОИСК ==========
+$('searchBtn').addEventListener('click', doSearch);
+$('searchInput').addEventListener('keydown', (e) => { if (e.key === 'Enter') doSearch(); });
+$('clearFiltersBtn').addEventListener('click', () => {
+    $('searchInput').value = '';
+    $('categoryFilter').value = '';
+    doSearch();
+});
+
+// ========== ИНИЦИАЛИЗАЦИЯ ==========
+async function render() {
+    renderHeader();
+    await loadCategories();
+    await doSearch();
+}
+
+// Запуск
+render();
+
+console.log('📚 StudySpot Frontend loaded!');
+console.log('🔑 Admin: admin@studyspot.com / admin123');
+</script>
+</body>
+</html>
