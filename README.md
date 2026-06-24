@@ -309,10 +309,3 @@ docker exec -it studyspot-db psql -U postgres -d studyspot
 ## 📄 Лицензия
 
 Проект распространяется под лицензией MIT. Подробности в файле LICENSE.
-
----
-
-<div align="center">
-  <p>🌟 Если вам понравился проект, поставьте звезду на GitHub!</p>
-  <p>📧 По всем вопросам: your@email.com</p>
-</div>
